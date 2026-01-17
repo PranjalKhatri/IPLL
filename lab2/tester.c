@@ -1,61 +1,62 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <string.h>
 #include <math.h>
 
+#define TEST_FILE "test_input.txt"
+#define TEMP_INPUT "current_test.txt"
 #define NUM_TESTS 100
 
-float selection_sort_and_get_kth(float* arr, int n, int k) {
-    for (int i = 0; i < n - 1; i++) {
-        int min_idx = i;
-        for (int j = i + 1; j < n; j++) {
-            if (arr[j] < arr[min_idx]) min_idx = j;
-        }
-        float temp = arr[i];
-        arr[i] = arr[min_idx];
-        arr[min_idx] = temp;
-    }
-    return arr[k - 1]; // k-th smallest
-}
-
 int main() {
-    srand(time(NULL));
+    FILE *fp = fopen(TEST_FILE, "r");
+    if (!fp) {
+        perror("Could not open test_input.txt");
+        return 1;
+    }
+
     int passed = 0;
+    char n_k_line[256];
+    char array_line[4096]; 
+    char expected_line[256];
 
     for (int t = 1; t <= NUM_TESTS; t++) {
-        int n = (rand() % 20) + 5;
-        int k = (rand() % n) + 1;
-        float* arr = malloc(n * sizeof(float));
+        if (!fgets(n_k_line, sizeof(n_k_line), fp)) break;
+        if (!fgets(array_line, sizeof(array_line), fp)) break;
+        if (!fgets(expected_line, sizeof(expected_line), fp)) break;
 
-        FILE* input_file = fopen("test_input.txt", "w");
-        fprintf(input_file, "%d %d\n", n, k);
-        for (int i = 0; i < n; i++) {
-            arr[i] = ((float)rand() / (float)RAND_MAX) * 100.0f;
-            fprintf(input_file, "%f ", arr[i]);
+        float expected = atof(expected_line);
+        FILE *tmp = fopen(TEMP_INPUT, "w");
+        fprintf(tmp, "%s%s", n_k_line, array_line);
+        fclose(tmp);
+
+        char command[512];
+        snprintf(command, sizeof(command), "./bin/test < %s", TEMP_INPUT);
+        
+        FILE *asm_pipe = popen(command, "r");
+        if (!asm_pipe) {
+            perror("Failed to run assembly program");
+            return 1;
         }
-        fclose(input_file);
 
-        float expected = selection_sort_and_get_kth(arr, n, k);
-
-        FILE* pipe = popen("./bin/test < test_input.txt", "r");
         char buffer[128];
         float actual = 0.0f;
-        
-        while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
-            sscanf(buffer, "%f", &actual);
+        while (fgets(buffer, sizeof(buffer), asm_pipe) != NULL) {
+            if (sscanf(buffer, "%f", &actual) == 1) {
+            }
         }
-        pclose(pipe);
+        pclose(asm_pipe);
 
         if (fabs(actual - expected) < 0.01f) {
             passed++;
-            printf("expected %f, actual %f\n",expected,actual);
         } else {
-            printf("Test %d FAILED: N=%d, K=%d | Expected: %f, Got: %f\n", t, n, k, expected, actual);
+            printf("Test %d FAILED | Expected: %f, Got: %f\n", t, expected, actual);
         }
-        free(arr);
     }
 
-    printf("\n--- RESULTS ---\n");
+    fclose(fp);
+    remove(TEMP_INPUT);
+    printf("\n--- FINAL RESULTS ---\n");
     printf("Passed: %d/%d\n", passed, NUM_TESTS);
+
     return (passed == NUM_TESTS) ? 0 : 1;
 }
