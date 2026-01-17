@@ -50,6 +50,7 @@ main:
     mov     eax,    dword [ebp-4]
     sub     eax,    dword [ebp-8]
     add     eax,    1
+    mov     dword [ebp-8], eax
 .ReadArr:
     mov     eax,    dword [ebp-4]
     shl     eax,    2
