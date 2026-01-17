@@ -6,5 +6,5 @@ extern ReadUInt
 extern PrintString
 extern ListInput
 extern ZeroMemory
-
+extern PrintUInt
 %endif
