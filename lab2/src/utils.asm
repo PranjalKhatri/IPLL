@@ -154,20 +154,35 @@ PrintString:
 ;CPrintFloat(float f)
 CPrintFloat:
     push    ebp
-    mov     ebp,    esp
+    mov     ebp, esp
 
-    movss   xmm0, dword [ebp+8]
-    cvtss2sd xmm0, xmm0
+    fld     dword [ebp+8]       ;fld->load on float stack in 80 bit precision
     sub     esp, 8
-    movsd   qword [esp], xmm0
-
+    fstp    qword [esp]         ; push to stack from flt stack
     push    vfloat_fmt_str
     call    printf
 
-    add     esp, 12
-    mov     esp,    ebp
+    add     esp, 12             ; 8 double +4 char*
+    mov     esp, ebp
     pop     ebp
     ret
+; xmm regs not allowed in lab
+; CPrintFloat:
+;     push    ebp
+;     mov     ebp,    esp
+;
+;     movss   xmm0, dword [ebp+8]
+;     cvtss2sd xmm0, xmm0
+;     sub     esp, 8
+;     movsd   qword [esp], xmm0
+;
+;     push    vfloat_fmt_str
+;     call    printf
+;
+;     add     esp, 12
+;     mov     esp,    ebp
+;     pop     ebp
+;     ret
     
 ;PrintUInt(unsigned int a)
 PrintUInt:
@@ -347,41 +362,90 @@ FloatSelectionSort:
     pop     ebp
     ret
 
-;FloatListFindMinIdx(float*ptr,unsigned int *idx,unsigned int sz)
+; FloatListFindMinIdx(float* ptr, unsigned int* idx, unsigned int sz)
 FloatListFindMinIdx:
     push    ebp
-    mov     ebp,    esp
+    mov     ebp, esp
     push    ebx
+    push    edi
 
-    mov     eax,    [ebp+8]    ; eax = ptr
-    mov     edx,    [ebp+12]   ; edx = ptr to idx
-    mov     ecx,    [ebp+16]   ; ecx = sz
+    mov     eax, [ebp+8]      ; eax = ptr
+    mov     edx, [ebp+12]     ; edx = ptr to idx
+    mov     ecx, [ebp+16]     ; ecx = sz
 
-    test    ecx,    ecx
-    jz      .Done
+    test    ecx, ecx
+    jz      .Done             ; empty array
 
-    movss   xmm1,   dword [eax] ; xmm1 = current min value
-    xor     ebx,    ebx         ; ebx = current index (0)
-    xor     edi,    edi         ; edi = best index found so far (0)
+    fld     dword [eax]       ; initial min
+    xor     edi, edi          ; bestidx
+    mov     ebx, 1            ; curidx=1
+
+    cmp     ecx, 1
+    jbe     .WriteResult
 
 .Loop:
-    movss   xmm0,   dword [eax + ebx*4] 
+    fld     dword [eax + ebx*4]
+    fcomi   st0, st1
     
-    ucomiss xmm0,   xmm1
-    jae     .SkipMin
-    
-    movss   xmm1,   xmm0        ; update min value
-    mov     edi,    ebx         ; update best index
+    jae     .NotSmaller
 
-.SkipMin:
+    fstp    st1             ; top to 1st and pop top so first at top.confusing shit
+    mov     edi, ebx          ; Update best index
+    jmp     .Next
+
+.NotSmaller:
+    fstp    st0             ; pop new element
+
+.Next:
     inc     ebx
-    cmp     ebx,    ecx
+    cmp     ebx, ecx
     jl      .Loop
 
-    mov     [edx],  edi
+.WriteResult:
+    mov     dword [edx], edi
+    fstp    st0             ;cleanup
 
 .Done:
+    pop     edi
     pop     ebx
-    mov     esp,    ebp
+    mov     esp, ebp
     pop     ebp
     ret
+
+; FloatListFindMinIdx:
+;     push    ebp
+;     mov     ebp,    esp
+;     push    ebx
+;
+;     mov     eax,    [ebp+8]    ; eax = ptr
+;     mov     edx,    [ebp+12]   ; edx = ptr to idx
+;     mov     ecx,    [ebp+16]   ; ecx = sz
+;
+;     test    ecx,    ecx
+;     jz      .Done
+;
+;     movss   xmm1,   dword [eax] ; xmm1 = current min value
+;     xor     ebx,    ebx         ; ebx = current index (0)
+;     xor     edi,    edi         ; edi = best index found so far (0)
+;
+; .Loop:
+;     movss   xmm0,   dword [eax + ebx*4] 
+;
+;     ucomiss xmm0,   xmm1
+;     jae     .SkipMin
+;
+;     movss   xmm1,   xmm0        ; update min value
+;     mov     edi,    ebx         ; update best index
+;
+; .SkipMin:
+;     inc     ebx
+;     cmp     ebx,    ecx
+;     jl      .Loop
+;
+;     mov     [edx],  edi
+;
+; .Done:
+;     pop     ebx
+;     mov     esp,    ebp
+;     pop     ebp
+;     ret
