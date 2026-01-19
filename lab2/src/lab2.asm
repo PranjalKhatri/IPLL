@@ -6,6 +6,8 @@ global KeleSortFloatList
 section .data
     vprompt_string          db  "Input n and k, followed by n floats: "
     vprompt_string_size     dd  $ - vprompt_string
+    verror_string           db  "k should be smaller then n."
+    verror_string_size      db  $ - verror_string
 
 section .text
     
@@ -29,6 +31,16 @@ KeleSortFloatList:
     push    eax
     call    ReadUInt
     add     esp,    4
+
+    mov     eax,    dword [ebp-4]
+    cmp     eax,    dword [ebp-8]
+    jge     .Transformk
+    push    dword [verror_string_size]
+    push    verror_string
+    call    PrintString
+    mov     eax,    1
+    int     0x80
+.Transformk:
     ;k->n-k+1 for k largest.
     mov     eax,    dword [ebp-4]
     sub     eax,    dword [ebp-8]
