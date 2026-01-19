@@ -22,6 +22,8 @@ global main
 section .data
     vprompt_string          db  "Input n and k, followed by n floats: "
     vprompt_string_size     dd  $ - vprompt_string
+    verror_string           db  "Invalid Input"
+    verror_string_size      db  $ - verror_string
     vfloat_fmt_str          db  "%f",0
 
 section .text
@@ -46,6 +48,25 @@ main:
     push    eax
     call    ReadUInt
     add     esp,    4
+    mov     eax,    dword [ebp-4]
+    test    eax,    eax
+    jz      .InvalidInputPrint
+
+    mov     eax,    dword [ebp-8]
+    test    eax,    eax
+    jz      .InvalidInputPrint
+
+    mov     eax,    dword [ebp-4]    ; eax = n
+    cmp     eax,    dword [ebp-8]    ; n ? k
+    jge     .Transformk           ; n >= k → valid
+
+.InvalidInputPrint:
+    push    dword [verror_string_size]
+    push    verror_string
+    call    PrintString
+    mov     eax,    1
+    int     0x80
+.Transformk:
     ;k->n-k+1 for k largest.
     mov     eax,    dword [ebp-4]
     sub     eax,    dword [ebp-8]

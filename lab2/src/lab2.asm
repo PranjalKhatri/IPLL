@@ -6,7 +6,7 @@ global KeleSortFloatList
 section .data
     vprompt_string          db  "Input n and k, followed by n floats: "
     vprompt_string_size     dd  $ - vprompt_string
-    verror_string           db  "k should be smaller then n."
+    verror_string           db  "Invalid Input"
     verror_string_size      db  $ - verror_string
 
 section .text
@@ -33,8 +33,18 @@ KeleSortFloatList:
     add     esp,    4
 
     mov     eax,    dword [ebp-4]
-    cmp     eax,    dword [ebp-8]
-    jge     .Transformk
+    test    eax,    eax
+    jz      .InvalidInputPrint
+
+    mov     eax,    dword [ebp-8]
+    test    eax,    eax
+    jz      .InvalidInputPrint
+
+    mov     eax,    dword [ebp-4]    ; eax = n
+    cmp     eax,    dword [ebp-8]    ; n ? k
+    jge     .Transformk           ; n >= k → valid
+
+.InvalidInputPrint:
     push    dword [verror_string_size]
     push    verror_string
     call    PrintString
