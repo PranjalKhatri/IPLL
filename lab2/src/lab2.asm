@@ -7,7 +7,7 @@ section .data
     vprompt_string          db  "Input n and k, followed by n floats: "
     vprompt_string_size     dd  $ - vprompt_string
     verror_string           db  "Invalid Input"
-    verror_string_size      db  $ - verror_string
+    verror_string_size      dd  $ - verror_string
 
 section .text
     

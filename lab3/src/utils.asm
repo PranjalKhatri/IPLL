@@ -1,111 +1,25 @@
-STDIN                            equ  0
-STDOUT                           equ  0
-
-NR_restart_syscall               equ  0
-NR_exit                          equ  1
-NR_fork                          equ  2
-NR_read                          equ  3
-NR_write                         equ  4
-NR_open                          equ  5
-
-new_line         equ 10
-carriage_return  equ 13
-spacebar         equ 32
-tab_char         equ 9
-asci_zero        equ '0'
+%include "./syscalls.inc"
+%include "./constatnts.inc"
 
 extern scanf
 extern printf
 
-global main
+global ListFindMax
+global ReadUInt
+global ReadFloat
+global PrintString
+global ListInput
+global FloatListInput
+global FloatListFindMinIdx
+global FloatSelectionSort
+global ZeroMemory
+global PrintUInt
+global CPrintFloat
 
 section .data
-    vprompt_string          db  "Input n and k, followed by n floats: "
-    vprompt_string_size     dd  $ - vprompt_string
-    verror_string           db  "Invalid Input"
-    verror_string_size      dd  $ - verror_string
-    vfloat_fmt_str          db  "%f",0
+    vfloat_fmt_str    db  "%f",0
 
 section .text
-    
-main:
-    push    ebp
-    mov     ebp,    esp
-    push    edi
-
-    sub     esp,    8   ;space for local variable n and k
-.Prompt:
-    push    dword [vprompt_string_size]
-    push    vprompt_string
-    call    PrintString
-    add     esp,    8
-.Readnk:
-    lea     eax,    dword [ebp-4]
-    push    eax
-    call    ReadUInt
-    add     esp,    4
-    lea     eax,    dword [ebp-8]
-    push    eax
-    call    ReadUInt
-    add     esp,    4
-    mov     eax,    dword [ebp-4]
-    test    eax,    eax
-    jz      .InvalidInputPrint
-
-    mov     eax,    dword [ebp-8]
-    test    eax,    eax
-    jz      .InvalidInputPrint
-
-    mov     eax,    dword [ebp-4]    ; eax = n
-    cmp     eax,    dword [ebp-8]    ; n ? k
-    jge     .Transformk           ; n >= k → valid
-
-.InvalidInputPrint:
-    push    dword [verror_string_size]
-    push    verror_string
-    call    PrintString
-    add     esp,    8
-    mov     eax,    NR_exit
-    int     0x80
-.Transformk:
-    ;k->n-k+1 for k largest.
-    mov     eax,    dword [ebp-4]
-    sub     eax,    dword [ebp-8]
-    add     eax,    1
-    mov     dword [ebp-8], eax
-.ReadArr:
-    mov     eax,    dword [ebp-4]
-    shl     eax,    2
-    sub     esp,    eax ;reserve space for floats after n and k
-    lea     edi,    dword [esp]
-    shr     eax,    2
-
-    push    eax
-    push    edi
-    call    FloatListInput
-    add     esp,    8
-.SortArr:
-    mov     ecx,    dword [ebp-4]
-    push    ecx
-    push    edi
-    call    FloatSelectionSort
-    add     esp,    8
-.FindKth:
-    mov     eax,    dword [ebp-8]
-    dec     eax;0 based
-    shl     eax,    2
-    add     edi,    eax
-    mov     eax,    dword [edi]
-    ;print it
-    push    eax
-    call    CPrintFloat 
-    pop     eax
-.Done:
-    pop     edi
-    mov     esp,    ebp
-    pop     ebp
-    ret
-
 
 ;ReadUInt(uint&num)
 ReadUInt:
@@ -252,6 +166,23 @@ CPrintFloat:
     mov     esp, ebp
     pop     ebp
     ret
+; xmm regs not allowed in lab
+; CPrintFloat:
+;     push    ebp
+;     mov     ebp,    esp
+;
+;     movss   xmm0, dword [ebp+8]
+;     cvtss2sd xmm0, xmm0
+;     sub     esp, 8
+;     movsd   qword [esp], xmm0
+;
+;     push    vfloat_fmt_str
+;     call    printf
+;
+;     add     esp, 12
+;     mov     esp,    ebp
+;     pop     ebp
+;     ret
     
 ;PrintUInt(unsigned int a)
 PrintUInt:
@@ -481,4 +412,40 @@ FloatListFindMinIdx:
     pop     ebp
     ret
 
-
+; FloatListFindMinIdx:
+;     push    ebp
+;     mov     ebp,    esp
+;     push    ebx
+;
+;     mov     eax,    [ebp+8]    ; eax = ptr
+;     mov     edx,    [ebp+12]   ; edx = ptr to idx
+;     mov     ecx,    [ebp+16]   ; ecx = sz
+;
+;     test    ecx,    ecx
+;     jz      .Done
+;
+;     movss   xmm1,   dword [eax] ; xmm1 = current min value
+;     xor     ebx,    ebx         ; ebx = current index (0)
+;     xor     edi,    edi         ; edi = best index found so far (0)
+;
+; .Loop:
+;     movss   xmm0,   dword [eax + ebx*4] 
+;
+;     ucomiss xmm0,   xmm1
+;     jae     .SkipMin
+;
+;     movss   xmm1,   xmm0        ; update min value
+;     mov     edi,    ebx         ; update best index
+;
+; .SkipMin:
+;     inc     ebx
+;     cmp     ebx,    ecx
+;     jl      .Loop
+;
+;     mov     [edx],  edi
+;
+; .Done:
+;     pop     ebx
+;     mov     esp,    ebp
+;     pop     ebp
+;     ret
