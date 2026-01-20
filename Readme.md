@@ -19,10 +19,17 @@ ld -m elf_i386 230101077_seta.o
 ./a.out
 ```
 
-for lab1 setB:
+for lab1 setB1:
 ```bash
-nasm -f elf32 230101077_setb.asm
-gcc -m32 230101077_setb.o
+nasm -f elf32 230101077_setb1.asm
+gcc -m32 230101077_setb1.o
+./a.out
+
+```
+for lab1 setB2:
+```bash
+nasm -f elf32 230101077_setb2.asm
+ld -m elf_i386 230101077_setb2.o
 ./a.out
 
 ```
