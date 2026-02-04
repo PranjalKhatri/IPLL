@@ -4,49 +4,45 @@
 #include <string.h>
 
 #include "assembler.h"
-
-int Resolve_LDA(const char* args[3], InstructionHex* out) { return 0; }
-int Resolve_ADD(const char* args[3], InstructionHex* out) { return 0; }
-int Resolve_RSUB(const char* args[3], InstructionHex* out) { return 0; }
-int Resolve_DIR(const char* args[3], InstructionHex* out) { return 0; }
+#include "util.h"
 
 static const MnemonicInfo OPTAB[] = {
     // assembler directives
-    {MNEMONIC_START, 0, "DUMMY~~~", Resolve_DIR},
-    {START, 0, "START", Resolve_DIR},
-    {END, 0, "END", Resolve_DIR},
-    {BYTE, 0, "BYTE", Resolve_DIR},
-    {WORD, 0, "WORD", Resolve_DIR},
-    {RESB, 0, "RESB", Resolve_DIR},
-    {RESW, 0, "RESW", Resolve_DIR},
+    {MNEMONIC_START, 0, "DUMMY~~~"},
+    {START, 0, "START"},
+    {END, 0, "END"},
+    {BYTE, 0, "BYTE"},
+    {WORD, 0, "WORD"},
+    {RESB, 0, "RESB"},
+    {RESW, 0, "RESW"},
 
     // instructions
-    {LDA, 0x00, "LDA", Resolve_LDA},
-    {LDX, 0x04, "LDX", Resolve_LDA},
-    {LDL, 0x08, "LDL", Resolve_LDA},
-    {STA, 0x0c, "STA", Resolve_LDA},
-    {STX, 0x10, "STX", Resolve_LDA},
-    {STL, 0x14, "STL", Resolve_LDA},
-    {LDCH, 0x50, "LDCH", Resolve_LDA},
-    {STCH, 0x54, "STCH", Resolve_LDA},
+    {LDA, 0x00, "LDA"},
+    {LDX, 0x04, "LDX"},
+    {LDL, 0x08, "LDL"},
+    {STA, 0x0c, "STA"},
+    {STX, 0x10, "STX"},
+    {STL, 0x14, "STL"},
+    {LDCH, 0x50, "LDCH"},
+    {STCH, 0x54, "STCH"},
 
-    {ADD, 0x18, "ADD", Resolve_ADD},
-    {SUB, 0x1c, "SUB", Resolve_ADD},
-    {MUL, 0x20, "MUL", Resolve_ADD},
-    {DIV, 0x24, "DIV", Resolve_ADD},
-    {COMP, 0x28, "COMP", Resolve_ADD},
+    {ADD, 0x18, "ADD"},
+    {SUB, 0x1c, "SUB"},
+    {MUL, 0x20, "MUL"},
+    {DIV, 0x24, "DIV"},
+    {COMP, 0x28, "COMP"},
 
-    {J, 0x3c, "J", Resolve_ADD},
-    {JLT, 0x38, "JLT", Resolve_ADD},
-    {JEQ, 0x30, "JEQ", Resolve_ADD},
-    {JGT, 0x34, "JGT", Resolve_ADD},
-    {JSUB, 0x48, "JSUB", Resolve_ADD},
-    {RSUB, 0x4c, "RSUB", Resolve_RSUB},
+    {J, 0x3c, "J"},
+    {JLT, 0x38, "JLT"},
+    {JEQ, 0x30, "JEQ"},
+    {JGT, 0x34, "JGT"},
+    {JSUB, 0x48, "JSUB"},
+    {RSUB, 0x4c, "RSUB"},
 
-    {TIX, 0x2c, "TIX", Resolve_ADD},
-    {TD, 0xe0, "TD", Resolve_ADD},
-    {RD, 0xd8, "RD", Resolve_ADD},
-    {WD, 0xdc, "WD", Resolve_ADD},
+    {TIX, 0x2c, "TIX"},
+    {TD, 0xe0, "TD"},
+    {RD, 0xd8, "RD"},
+    {WD, 0xdc, "WD"},
 };
 int IsDirective(const char* const str) {
     size_t i;
@@ -94,10 +90,84 @@ int AddressToAdd(Mnemonic mne, ObjectCodeLine* obcl) {
     int retAddr       = 0;
     int arg0Converted = 0;
     int isChar        = 0;
-    if (obcl->source->args[0]) arg0Converted = parse_constant(obcl->source->args[0],&isChar);
+    if (obcl->source->args[0])
+        arg0Converted = parse_constant(obcl->source->args[0], &isChar);
     if (mne < DIRECTIVE_END) {
         retAddr = DirAddressToAdd(mne, arg0Converted, isChar);
     } else
         retAddr = 3;  // for all operands
     return retAddr;
+}
+
+// < 0 -> error
+// number of chars written
+int ResolveObjectCode(ObjectCodeLine* obcl, HashTable* symbolTable, char* buf,
+                      size_t buflen) {
+    Mnemonic mne = IsMnemonic(obcl->source->mnemonic);
+    if (!mne) return -1;
+
+    // No object code
+    if (mne == RESB || mne == RESW) return 0;
+
+    if (mne == WORD) {
+        int tmp = 0;
+        int num = parse_constant(obcl->source->args[0], &tmp);
+
+        // WORD is always 3 bytes
+        snprintf(buf, buflen, "%06X", num & 0xFFFFFF);
+        return 3;
+    }
+
+    // BYTE = variable
+    if (mne == BYTE) {
+        int isChar = 0;
+        int val    = parse_constant(obcl->source->args[0], &isChar);
+
+        // BYTE C'...'
+        if (isChar) {
+            const char* s  = obcl->source->args[0];
+
+            // skip C'
+            s             += 2;
+
+            int count      = 0;
+            while (*s && *s != '\'') {
+                snprintf(buf + count * 2, buflen - count * 2, "%02X",
+                         (unsigned char)*s);
+                count++;
+                s++;
+            }
+            return count;
+        }
+
+        // BYTE X'...' or numeric
+        int byte_req = bytes_needed_unsigned(val);
+        snprintf(buf, buflen, "%0*X", byte_req * 2, val);
+        return byte_req;
+    }
+
+    int address = 0, UseIndexed = 0;
+
+    // operand label not source label
+    if (obcl->source->args[0] != NULL) {
+        if (!ht_get(symbolTable, obcl->source->args[0], &address)) {
+            printf("Unable to resolve symbol %s on line %zu\n",
+                   obcl->source->args[0], obcl->source->lineNo);
+            return 1;
+        }
+    }
+    if (obcl->source->args[1] != NULL) {
+        if (tolower(obcl->source->args[1][0]) == 'x') {
+            UseIndexed = 1;
+        }
+    }
+
+    int opcode = OPTAB[mne].opcode;
+
+    if (UseIndexed) address |= 0x8000;
+
+    // opcode: 1 byte, address: 2 bytes
+    snprintf(buf, buflen, "%02X%04X", opcode & 0xFF, address & 0xFFFF);
+
+    return 3;
 }

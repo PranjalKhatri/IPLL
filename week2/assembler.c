@@ -15,13 +15,22 @@ int main(int argc, char** argv) {
     }
     SymbolTable = ht_create();
 
-    int error;
-    size_t numLines, programLength;
-    if ((error = GenerateIntermediate(argv[1], &numLines, &programLength,SymbolTable)))
-        return error;
-    ht_print(SymbolTable);
+    int error, retVal = 0;
+    size_t numLines, programLength, firstInstruction;
+    if ((error = GenerateIntermediate(argv[1], &numLines, &programLength,
+                                      &firstInstruction, SymbolTable))) {
+        retVal = error;
+        goto CleanupAndExit;
+    }
+    // ht_print(SymbolTable);
+    if ((error = GenerateObject(argv[1], argv[2], programLength,
+                                firstInstruction, SymbolTable))) {
+        goto CleanupAndExit;
+        retVal = error;
+    }
+CleanupAndExit:
     ht_destroy(SymbolTable);
-    return 0;
+    return retVal;
 }
 
 void Usage() { printf("USAGE: assembler <inputFile> <outputFile>"); }
