@@ -4,30 +4,36 @@
 
 #include "assembler.h"
 
-int LexAndInit(const char* const fname, SourceLine** sourceLines,
-               ObjectCodeLine** objectCodeLines, size_t* capacity) {
-    FILE* fp = fopen(fname, "r");
+int GenerateIntermediate(const char* const fname, size_t* capacity,
+                         size_t* programLength, HashTable* symbolTable) {
+    char imm_fname[512];
+    snprintf(imm_fname, sizeof(imm_fname), "%s_intermediate.txt", fname);
+    FILE* fp   = fopen(fname, "r");
+    FILE* imfp = fopen(imm_fname, "w");
     if (fp == NULL) {
         printf("Unable to open file %s\n", fname);
         return 1;
     }
+    if (imfp == NULL) {
+        printf("Unable to open file %s\n", imm_fname);
+        return 1;
+    }
 
-    int          retValue = 0;
-    const size_t buflen   = 150;
-    char         buf[150];
-    size_t       lineNo     = 0;
-    size_t       index      = 0;
-    size_t       loc        = 0;
-    int          isFirstMne = 1;
+    int retValue        = 0;
+    const size_t buflen = 150;
+    char buf[150];
+    size_t lineNo   = 0;
+    size_t index    = 0;
+    size_t loc      = 0;
+    size_t locStart = 0;
+    int isFirstMne  = 1;
 
     /* initial capacity */
-    *capacity               = 8;
-    *sourceLines            = malloc((*capacity) * sizeof(SourceLine));
-    *objectCodeLines        = malloc((*capacity) * sizeof(ObjectCodeLine));
-    if (*sourceLines == NULL || *objectCodeLines == NULL) {
-        fclose(fp);
-        return 3;
-    }
+    *capacity       = 8;
+    SourceLine sl;
+    SourceLine_init(&sl);
+    ObjectCodeLine obcl;
+    ObjectCodeLine_init(&obcl);
 
     while (fgets(buf, buflen, fp)) {
         size_t len = strlen(buf);
@@ -44,66 +50,63 @@ int LexAndInit(const char* const fname, SourceLine** sourceLines,
             }
         }
 
-        if (index >= *capacity) {
-            size_t      newCap = (*capacity) * 2;
-            SourceLine* tmp =
-                realloc(*sourceLines, newCap * sizeof(SourceLine));
-            ObjectCodeLine* tmpo =
-                realloc(*objectCodeLines, newCap * sizeof(ObjectCodeLine));
-            if (tmp == NULL || tmpo == NULL) {
-                retValue = 3;
-                goto exit;
-            }
-            *sourceLines     = tmp;
-            *objectCodeLines = tmpo;
-            *capacity        = newCap;
-        }
-
         // init source line
-        SourceLine* sl = &(*sourceLines)[index];
-        SourceLine_init(sl);
+        SourceLine_init(&sl);
 
         // init objectCode line
-        ObjectCodeLine* ocl = &(*objectCodeLines)[index];
-        ObjectCodeLine_init(ocl);
-        ocl->source    = sl;
+        ObjectCodeLine_init(&obcl);
+        obcl.source   = &sl;
 
-        sl->lineNo     = ++lineNo;
+        sl.lineNo     = ++lineNo;
         // split later
-        sl->sourceLine = malloc(strlen(buf) + 1);
-        if (sl->sourceLine == NULL) {
+        sl.sourceLine = malloc(strlen(buf) + 1);
+        if (sl.sourceLine == NULL) {
             retValue = 3;
             goto exit;
         }
-        strcpy(sl->sourceLine, buf);
-        SplitInstruction(sl);
-        if (!sl->isComment) {
-            Mnemonic mne = IsMnemonic(sl->instruction);
+        strcpy(sl.sourceLine, buf);
+        SplitInstruction(&sl);
+        if (!sl.isComment) {
+            Mnemonic mne = IsMnemonic(sl.instruction);
             if (isFirstMne) {
                 if (mne != START) {
                     printf("First Mnemonic should be START");
                     exit(5);
                 }
                 isFirstMne = 0;
-                loc        = strtol(sl->args[0], NULL, 16);
+                loc        = strtol(sl.args[0], NULL, 16);
+                locStart   = loc;
             }
-            ocl->location  = loc;
-            loc           += AddressToAdd(mne, ocl);
+            obcl.location = loc;
+            if (sl.label != NULL) {
+                int out = 0;
+                if (ht_get(symbolTable, sl.label, &out)) {
+                    retValue = 6;
+                    printf("Duplicate symbol found %s on line %zu\n", sl.label,
+                           sl.lineNo);
+                    goto exit;
+                } else {
+                    ht_put(symbolTable, sl.label, loc);
+                }
+            }
+            loc += AddressToAdd(mne, &obcl);
         }
-
+        DumpObject(imfp, &obcl);
         index++;
+        free(sl.sourceLine);
     }
-
-    *capacity = index;
+    *programLength = loc - locStart;
+    *capacity      = index;
 exit:
     fclose(fp);
+    fclose(imfp);
     return retValue;
 }
 
 void SplitInstruction(SourceLine* const sl) {
     char* p;
     char* tok;
-    int   argIndex = 0;
+    int argIndex = 0;
 
     if (sl == NULL || sl->sourceLine == NULL) return;
 
@@ -177,6 +180,34 @@ void DumpLex(const char* const fname, SourceLine* sourceLines,
 
     fclose(fp);
 }
+void DumpObject(FILE* fp, ObjectCodeLine* ol) {
+    if (ol == NULL || fp == NULL) return;
+#define LOC_WIDTH   6
+#define LABEL_WIDTH 12
+#define INST_WIDTH  8
+    if (ol->source->isComment) {
+        fprintf(fp, "      \t%s\n", ol->source->sourceLine);
+        return;
+    }
+
+    // location
+    fprintf(fp, "%-*zx ", LOC_WIDTH, ol->location);
+
+    // label (or empty)
+    fprintf(fp, "%-*s ", LABEL_WIDTH,
+            ol->source->label ? ol->source->label : "");
+
+    // instruction
+    fprintf(fp, "%-*s ", INST_WIDTH, ol->source->instruction);
+
+    // operands
+    for (int j = 0; j < 3 && ol->source->args[j] != NULL; j++) {
+        fprintf(fp, "%s", ol->source->args[j]);
+        if (j < 2 && ol->source->args[j + 1] != NULL) fprintf(fp, ",");
+    }
+
+    fprintf(fp, "\n");
+}
 void DumpIntermediate(const char* const fname, ObjectCodeLine* objectCodeLines,
                       size_t numLines) {
     if (fname == NULL || objectCodeLines == NULL) return;
@@ -187,35 +218,8 @@ void DumpIntermediate(const char* const fname, ObjectCodeLine* objectCodeLines,
         return;
     }
 
-#define LOC_WIDTH   6
-#define LABEL_WIDTH 12
-#define INST_WIDTH  8
-
     for (size_t i = 0; i < numLines; i++) {
-        ObjectCodeLine ol = objectCodeLines[i];
-
-        if (ol.source->isComment) {
-            fprintf(fp, "      \t%s\n", ol.source->sourceLine);
-            continue;
-        }
-
-        // location
-        fprintf(fp, "%-*zx ", LOC_WIDTH, ol.location);
-
-        // label (or empty)
-        fprintf(fp, "%-*s ", LABEL_WIDTH,
-                ol.source->label ? ol.source->label : "");
-
-        // instruction
-        fprintf(fp, "%-*s ", INST_WIDTH, ol.source->instruction);
-
-        // operands
-        for (int j = 0; j < 3 && ol.source->args[j] != NULL; j++) {
-            fprintf(fp, "%s", ol.source->args[j]);
-            if (j < 2 && ol.source->args[j + 1] != NULL) fprintf(fp, ",");
-        }
-
-        fprintf(fp, "\n");
+        DumpObject(fp, &objectCodeLines[i]);
     }
 
     fclose(fp);

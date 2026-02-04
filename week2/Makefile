@@ -14,4 +14,5 @@ $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(TARGET) $(OBJS) *.exe
+	- rm -f $(TARGET) $(OBJS) *.exe
+	- del $(TARGET) $(OBJS) *.exe

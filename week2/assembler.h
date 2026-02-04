@@ -1,6 +1,8 @@
 #pragma once
 #include <stddef.h>
+#include <stdio.h>
 
+#include "hash.h"
 #include "util.h"
 
 typedef struct {
@@ -9,18 +11,18 @@ typedef struct {
 
 typedef struct {
     size_t lineNo;
-    char*  sourceLine;
-    char*  label;        // optional
-    char*  instruction;  // operation name
+    char* sourceLine;
+    char* label;        // optional
+    char* instruction;  // operation name
     // different instructions can have different operands
-    char*  args[3];
-    int    isComment;
+    char* args[3];
+    int isComment;
 } SourceLine;
 
 typedef struct {
-    size_t         location;
+    size_t location;
     InstructionHex instruction;
-    SourceLine*    source;
+    SourceLine* source;
 } ObjectCodeLine;
 
 typedef enum {
@@ -61,24 +63,27 @@ typedef enum {
     MNEMONIC_COUNT
 } Mnemonic;
 
-void     InstructionHex_init(InstructionHex* ih);
-void     SourceLine_init(SourceLine* sl);
-void     ObjectCodeLine_init(ObjectCodeLine* ocl);
+void InstructionHex_init(InstructionHex* ih);
+void SourceLine_init(SourceLine* sl);
+void ObjectCodeLine_init(ObjectCodeLine* ocl);
 Mnemonic IsMnemonic(const char* const str);
-int      IsDirective(const char* const str);
-int      AddressToAdd(Mnemonic mne, ObjectCodeLine* obcl);
-int      LexAndInit(const char* const fname, SourceLine** sourceLines,
-                    ObjectCodeLine** objectCodeLines, size_t* capacity);
-void     SplitInstructions(SourceLine* const sourceLines, size_t numLines);
-void     SplitInstruction(SourceLine* const sl);
+int IsDirective(const char* const str);
+int AddressToAdd(Mnemonic mne, ObjectCodeLine* obcl);
+int GenerateIntermediate(const char* const fname, size_t* capacity,
+                         size_t* programLength, HashTable* symbolTable);
+int SymTableInsert(const char* const symbol, size_t location);
+int GetSymbolLocation(const char* const symbol);
+void SplitInstructions(SourceLine* const sourceLines, size_t numLines);
+void SplitInstruction(SourceLine* const sl);
 void DumpLex(const char* const fname, SourceLine* sourceLines, size_t numLines);
+void DumpObject(FILE* fp, ObjectCodeLine* ol);
 void DumpIntermediate(const char* const fname, ObjectCodeLine* objectCodeLines,
                       size_t numLines);
 
 typedef int (*ResolveFn)(const char* args[3], InstructionHex* out);
 typedef struct {
-    Mnemonic    mnemonic;
-    int         opcode;
-    const char* name;     // string form LDA, ADD..
-    ResolveFn   resolve;  // function to call to get code
+    Mnemonic mnemonic;
+    int opcode;
+    const char* name;   // string form LDA, ADD..
+    ResolveFn resolve;  // function to call to get code
 } MnemonicInfo;

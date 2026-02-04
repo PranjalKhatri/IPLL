@@ -1,0 +1,689 @@
+desc: (none)
+cmd: ./assembler input.txt output.txt
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=156528
+mem_heap_B=472
+mem_heap_extra_B=16
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=161282
+mem_heap_B=1989
+mem_heap_extra_B=67
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=3
+#-----------
+time=163361
+mem_heap_B=1991
+mem_heap_extra_B=65
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=4
+#-----------
+time=168278
+mem_heap_B=1990
+mem_heap_extra_B=66
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=5
+#-----------
+time=173353
+mem_heap_B=1968
+mem_heap_extra_B=48
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=177506
+mem_heap_B=1989
+mem_heap_extra_B=67
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=182309
+mem_heap_B=1991
+mem_heap_extra_B=65
+mem_stacks_B=0
+heap_tree=detailed
+n3: 1991 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 1024 0x48DD1B4: _IO_file_doallocate (filedoalloc.c:101)
+  n2: 1024 0x48ED523: _IO_doallocbuf (genops.c:347)
+   n1: 512 0x48EA883: _IO_file_underflow@@GLIBC_2.2.5 (fileops.c:486)
+    n1: 512 0x48ED5D1: _IO_default_uflow (genops.c:362)
+     n1: 512 0x48DEF79: _IO_getline_info (iogetline.c:60)
+      n1: 512 0x48DDBD3: fgets (iofgets.c:53)
+       n1: 512 0x10B55B: GenerateIntermediate (lexer.c:36)
+        n0: 512 0x10A667: main (assembler.c:17)
+   n1: 512 0x48EAF8F: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:745)
+    n1: 512 0x48EBAAE: _IO_new_file_xsputn (fileops.c:1244)
+     n1: 512 0x48EBAAE: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1197)
+      n1: 512 0x48B8CC8: __printf_buffer_flush_to_file (printf_buffer_to_file.c:59)
+       n1: 512 0x48B8CC8: __printf_buffer_to_file_done (printf_buffer_to_file.c:120)
+        n1: 512 0x48C3742: __vfprintf_internal (vfprintf-internal.c:1545)
+         n1: 512 0x48B75FB: fprintf (fprintf.c:32)
+          n1: 512 0x10BA45: DumpObject (lexer.c:180)
+           n1: 512 0x10B523: GenerateIntermediate (lexer.c:80)
+            n0: 512 0x10A667: main (assembler.c:17)
+ n1: 944 0x48DDE7E: __fopen_internal (iofopen.c:65)
+  n2: 944 0x48DDE7E: fopen@@GLIBC_2.2.5 (iofopen.c:86)
+   n1: 472 0x10B22B: GenerateIntermediate (lexer.c:10)
+    n0: 472 0x10A667: main (assembler.c:17)
+   n1: 472 0x10B24B: GenerateIntermediate (lexer.c:11)
+    n0: 472 0x10A667: main (assembler.c:17)
+ n1: 23 0x10B415: GenerateIntermediate (lexer.c:60)
+  n0: 23 0x10A667: main (assembler.c:17)
+#-----------
+snapshot=8
+#-----------
+time=187361
+mem_heap_B=1990
+mem_heap_extra_B=66
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=9
+#-----------
+time=192243
+mem_heap_B=1968
+mem_heap_extra_B=48
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=10
+#-----------
+time=197130
+mem_heap_B=1968
+mem_heap_extra_B=48
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=11
+#-----------
+time=201845
+mem_heap_B=1968
+mem_heap_extra_B=48
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=12
+#-----------
+time=205913
+mem_heap_B=1968
+mem_heap_extra_B=48
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=13
+#-----------
+time=209735
+mem_heap_B=1968
+mem_heap_extra_B=48
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=14
+#-----------
+time=214134
+mem_heap_B=1990
+mem_heap_extra_B=66
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=15
+#-----------
+time=219016
+mem_heap_B=1968
+mem_heap_extra_B=48
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=16
+#-----------
+time=223335
+mem_heap_B=1981
+mem_heap_extra_B=75
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=17
+#-----------
+time=228196
+mem_heap_B=1968
+mem_heap_extra_B=48
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=18
+#-----------
+time=231580
+mem_heap_B=3015
+mem_heap_extra_B=73
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=19
+#-----------
+time=235152
+mem_heap_B=3015
+mem_heap_extra_B=73
+mem_stacks_B=0
+heap_tree=peak
+n3: 3015 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 2048 0x48DD1B4: _IO_file_doallocate (filedoalloc.c:101)
+  n2: 2048 0x48ED523: _IO_doallocbuf (genops.c:347)
+   n1: 1536 0x48EAF8F: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:745)
+    n1: 1536 0x48EBAAE: _IO_new_file_xsputn (fileops.c:1244)
+     n1: 1536 0x48EBAAE: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1197)
+      n1: 1536 0x48B8CC8: __printf_buffer_flush_to_file (printf_buffer_to_file.c:59)
+       n1: 1536 0x48B8CC8: __printf_buffer_to_file_done (printf_buffer_to_file.c:120)
+        n2: 1536 0x48C3742: __vfprintf_internal (vfprintf-internal.c:1545)
+         n1: 1024 0x48B81B2: printf (printf.c:33)
+          n1: 1024 0x10AE16: DirAddressToAdd (instructions.c:79)
+           n1: 1024 0x10AF2B: AddressToAdd (instructions.c:100)
+            n1: 1024 0x10B501: GenerateIntermediate (lexer.c:78)
+             n0: 1024 0x10A667: main (assembler.c:17)
+         n1: 512 0x48B75FB: fprintf (fprintf.c:32)
+          n1: 512 0x10BA45: DumpObject (lexer.c:180)
+           n1: 512 0x10B523: GenerateIntermediate (lexer.c:80)
+            n0: 512 0x10A667: main (assembler.c:17)
+   n1: 512 0x48EA883: _IO_file_underflow@@GLIBC_2.2.5 (fileops.c:486)
+    n1: 512 0x48ED5D1: _IO_default_uflow (genops.c:362)
+     n1: 512 0x48DEF79: _IO_getline_info (iogetline.c:60)
+      n1: 512 0x48DDBD3: fgets (iofgets.c:53)
+       n1: 512 0x10B55B: GenerateIntermediate (lexer.c:36)
+        n0: 512 0x10A667: main (assembler.c:17)
+ n1: 944 0x48DDE7E: __fopen_internal (iofopen.c:65)
+  n2: 944 0x48DDE7E: fopen@@GLIBC_2.2.5 (iofopen.c:86)
+   n1: 472 0x10B22B: GenerateIntermediate (lexer.c:10)
+    n0: 472 0x10A667: main (assembler.c:17)
+   n1: 472 0x10B24B: GenerateIntermediate (lexer.c:11)
+    n0: 472 0x10A667: main (assembler.c:17)
+ n0: 23 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=20
+#-----------
+time=239791
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=21
+#-----------
+time=244428
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=22
+#-----------
+time=249152
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=23
+#-----------
+time=253876
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=24
+#-----------
+time=258690
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=25
+#-----------
+time=262098
+mem_heap_B=3013
+mem_heap_extra_B=75
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=26
+#-----------
+time=266520
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=27
+#-----------
+time=270910
+mem_heap_B=3014
+mem_heap_extra_B=74
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=28
+#-----------
+time=276111
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=29
+#-----------
+time=281163
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=30
+#-----------
+time=281494
+mem_heap_B=3014
+mem_heap_extra_B=74
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=31
+#-----------
+time=286707
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=32
+#-----------
+time=291510
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=33
+#-----------
+time=291841
+mem_heap_B=3013
+mem_heap_extra_B=75
+mem_stacks_B=0
+heap_tree=detailed
+n3: 3013 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 2048 0x48DD1B4: _IO_file_doallocate (filedoalloc.c:101)
+  n2: 2048 0x48ED523: _IO_doallocbuf (genops.c:347)
+   n1: 1536 0x48EAF8F: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:745)
+    n1: 1536 0x48EBAAE: _IO_new_file_xsputn (fileops.c:1244)
+     n1: 1536 0x48EBAAE: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1197)
+      n1: 1536 0x48B8CC8: __printf_buffer_flush_to_file (printf_buffer_to_file.c:59)
+       n1: 1536 0x48B8CC8: __printf_buffer_to_file_done (printf_buffer_to_file.c:120)
+        n2: 1536 0x48C3742: __vfprintf_internal (vfprintf-internal.c:1545)
+         n1: 1024 0x48B81B2: printf (printf.c:33)
+          n1: 1024 0x10AE16: DirAddressToAdd (instructions.c:79)
+           n1: 1024 0x10AF2B: AddressToAdd (instructions.c:100)
+            n1: 1024 0x10B501: GenerateIntermediate (lexer.c:78)
+             n0: 1024 0x10A667: main (assembler.c:17)
+         n1: 512 0x48B75FB: fprintf (fprintf.c:32)
+          n1: 512 0x10BA45: DumpObject (lexer.c:180)
+           n1: 512 0x10B523: GenerateIntermediate (lexer.c:80)
+            n0: 512 0x10A667: main (assembler.c:17)
+   n1: 512 0x48EA883: _IO_file_underflow@@GLIBC_2.2.5 (fileops.c:486)
+    n1: 512 0x48ED5D1: _IO_default_uflow (genops.c:362)
+     n1: 512 0x48DEF79: _IO_getline_info (iogetline.c:60)
+      n1: 512 0x48DDBD3: fgets (iofgets.c:53)
+       n1: 512 0x10B55B: GenerateIntermediate (lexer.c:36)
+        n0: 512 0x10A667: main (assembler.c:17)
+ n1: 944 0x48DDE7E: __fopen_internal (iofopen.c:65)
+  n2: 944 0x48DDE7E: fopen@@GLIBC_2.2.5 (iofopen.c:86)
+   n1: 472 0x10B22B: GenerateIntermediate (lexer.c:10)
+    n0: 472 0x10A667: main (assembler.c:17)
+   n1: 472 0x10B24B: GenerateIntermediate (lexer.c:11)
+    n0: 472 0x10A667: main (assembler.c:17)
+ n0: 21 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=34
+#-----------
+time=296795
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=35
+#-----------
+time=301528
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=36
+#-----------
+time=301859
+mem_heap_B=3015
+mem_heap_extra_B=73
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=37
+#-----------
+time=306908
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=38
+#-----------
+time=311878
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=39
+#-----------
+time=316752
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=40
+#-----------
+time=317085
+mem_heap_B=3005
+mem_heap_extra_B=83
+mem_stacks_B=0
+heap_tree=detailed
+n3: 3005 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 2048 0x48DD1B4: _IO_file_doallocate (filedoalloc.c:101)
+  n2: 2048 0x48ED523: _IO_doallocbuf (genops.c:347)
+   n1: 1536 0x48EAF8F: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:745)
+    n1: 1536 0x48EBAAE: _IO_new_file_xsputn (fileops.c:1244)
+     n1: 1536 0x48EBAAE: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1197)
+      n1: 1536 0x48B8CC8: __printf_buffer_flush_to_file (printf_buffer_to_file.c:59)
+       n1: 1536 0x48B8CC8: __printf_buffer_to_file_done (printf_buffer_to_file.c:120)
+        n2: 1536 0x48C3742: __vfprintf_internal (vfprintf-internal.c:1545)
+         n1: 1024 0x48B81B2: printf (printf.c:33)
+          n1: 1024 0x10AE16: DirAddressToAdd (instructions.c:79)
+           n1: 1024 0x10AF2B: AddressToAdd (instructions.c:100)
+            n1: 1024 0x10B501: GenerateIntermediate (lexer.c:78)
+             n0: 1024 0x10A667: main (assembler.c:17)
+         n1: 512 0x48B75FB: fprintf (fprintf.c:32)
+          n1: 512 0x10BA45: DumpObject (lexer.c:180)
+           n1: 512 0x10B523: GenerateIntermediate (lexer.c:80)
+            n0: 512 0x10A667: main (assembler.c:17)
+   n1: 512 0x48EA883: _IO_file_underflow@@GLIBC_2.2.5 (fileops.c:486)
+    n1: 512 0x48ED5D1: _IO_default_uflow (genops.c:362)
+     n1: 512 0x48DEF79: _IO_getline_info (iogetline.c:60)
+      n1: 512 0x48DDBD3: fgets (iofgets.c:53)
+       n1: 512 0x10B55B: GenerateIntermediate (lexer.c:36)
+        n0: 512 0x10A667: main (assembler.c:17)
+ n1: 944 0x48DDE7E: __fopen_internal (iofopen.c:65)
+  n2: 944 0x48DDE7E: fopen@@GLIBC_2.2.5 (iofopen.c:86)
+   n1: 472 0x10B22B: GenerateIntermediate (lexer.c:10)
+    n0: 472 0x10A667: main (assembler.c:17)
+   n1: 472 0x10B24B: GenerateIntermediate (lexer.c:11)
+    n0: 472 0x10A667: main (assembler.c:17)
+ n0: 13 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=41
+#-----------
+time=321986
+mem_heap_B=3014
+mem_heap_extra_B=74
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=42
+#-----------
+time=327465
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=43
+#-----------
+time=332238
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=44
+#-----------
+time=335646
+mem_heap_B=3013
+mem_heap_extra_B=75
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=45
+#-----------
+time=340399
+mem_heap_B=3015
+mem_heap_extra_B=73
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=46
+#-----------
+time=345600
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=47
+#-----------
+time=350652
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=48
+#-----------
+time=355634
+mem_heap_B=3015
+mem_heap_extra_B=73
+mem_stacks_B=0
+heap_tree=detailed
+n3: 3015 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 2048 0x48DD1B4: _IO_file_doallocate (filedoalloc.c:101)
+  n2: 2048 0x48ED523: _IO_doallocbuf (genops.c:347)
+   n1: 1536 0x48EAF8F: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:745)
+    n1: 1536 0x48EBAAE: _IO_new_file_xsputn (fileops.c:1244)
+     n1: 1536 0x48EBAAE: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1197)
+      n1: 1536 0x48B8CC8: __printf_buffer_flush_to_file (printf_buffer_to_file.c:59)
+       n1: 1536 0x48B8CC8: __printf_buffer_to_file_done (printf_buffer_to_file.c:120)
+        n2: 1536 0x48C3742: __vfprintf_internal (vfprintf-internal.c:1545)
+         n1: 1024 0x48B81B2: printf (printf.c:33)
+          n1: 1024 0x10AE16: DirAddressToAdd (instructions.c:79)
+           n1: 1024 0x10AF2B: AddressToAdd (instructions.c:100)
+            n1: 1024 0x10B501: GenerateIntermediate (lexer.c:78)
+             n0: 1024 0x10A667: main (assembler.c:17)
+         n1: 512 0x48B75FB: fprintf (fprintf.c:32)
+          n1: 512 0x10BA45: DumpObject (lexer.c:180)
+           n1: 512 0x10B523: GenerateIntermediate (lexer.c:80)
+            n0: 512 0x10A667: main (assembler.c:17)
+   n1: 512 0x48EA883: _IO_file_underflow@@GLIBC_2.2.5 (fileops.c:486)
+    n1: 512 0x48ED5D1: _IO_default_uflow (genops.c:362)
+     n1: 512 0x48DEF79: _IO_getline_info (iogetline.c:60)
+      n1: 512 0x48DDBD3: fgets (iofgets.c:53)
+       n1: 512 0x10B55B: GenerateIntermediate (lexer.c:36)
+        n0: 512 0x10A667: main (assembler.c:17)
+ n1: 944 0x48DDE7E: __fopen_internal (iofopen.c:65)
+  n2: 944 0x48DDE7E: fopen@@GLIBC_2.2.5 (iofopen.c:86)
+   n1: 472 0x10B22B: GenerateIntermediate (lexer.c:10)
+    n0: 472 0x10A667: main (assembler.c:17)
+   n1: 472 0x10B24B: GenerateIntermediate (lexer.c:11)
+    n0: 472 0x10A667: main (assembler.c:17)
+ n0: 23 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=49
+#-----------
+time=360929
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=50
+#-----------
+time=361260
+mem_heap_B=3015
+mem_heap_extra_B=73
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=51
+#-----------
+time=366701
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=52
+#-----------
+time=367032
+mem_heap_B=3014
+mem_heap_extra_B=74
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=53
+#-----------
+time=371671
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=54
+#-----------
+time=372004
+mem_heap_B=3005
+mem_heap_extra_B=83
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=55
+#-----------
+time=376574
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=56
+#-----------
+time=377139
+mem_heap_B=3014
+mem_heap_extra_B=74
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=57
+#-----------
+time=382554
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=58
+#-----------
+time=383046
+mem_heap_B=3014
+mem_heap_extra_B=74
+mem_stacks_B=0
+heap_tree=detailed
+n3: 3014 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 2048 0x48DD1B4: _IO_file_doallocate (filedoalloc.c:101)
+  n2: 2048 0x48ED523: _IO_doallocbuf (genops.c:347)
+   n1: 1536 0x48EAF8F: _IO_file_overflow@@GLIBC_2.2.5 (fileops.c:745)
+    n1: 1536 0x48EBAAE: _IO_new_file_xsputn (fileops.c:1244)
+     n1: 1536 0x48EBAAE: _IO_file_xsputn@@GLIBC_2.2.5 (fileops.c:1197)
+      n1: 1536 0x48B8CC8: __printf_buffer_flush_to_file (printf_buffer_to_file.c:59)
+       n1: 1536 0x48B8CC8: __printf_buffer_to_file_done (printf_buffer_to_file.c:120)
+        n2: 1536 0x48C3742: __vfprintf_internal (vfprintf-internal.c:1545)
+         n1: 1024 0x48B81B2: printf (printf.c:33)
+          n1: 1024 0x10AE16: DirAddressToAdd (instructions.c:79)
+           n1: 1024 0x10AF2B: AddressToAdd (instructions.c:100)
+            n1: 1024 0x10B501: GenerateIntermediate (lexer.c:78)
+             n0: 1024 0x10A667: main (assembler.c:17)
+         n1: 512 0x48B75FB: fprintf (fprintf.c:32)
+          n1: 512 0x10BA45: DumpObject (lexer.c:180)
+           n1: 512 0x10B523: GenerateIntermediate (lexer.c:80)
+            n0: 512 0x10A667: main (assembler.c:17)
+   n1: 512 0x48EA883: _IO_file_underflow@@GLIBC_2.2.5 (fileops.c:486)
+    n1: 512 0x48ED5D1: _IO_default_uflow (genops.c:362)
+     n1: 512 0x48DEF79: _IO_getline_info (iogetline.c:60)
+      n1: 512 0x48DDBD3: fgets (iofgets.c:53)
+       n1: 512 0x10B55B: GenerateIntermediate (lexer.c:36)
+        n0: 512 0x10A667: main (assembler.c:17)
+ n1: 944 0x48DDE7E: __fopen_internal (iofopen.c:65)
+  n2: 944 0x48DDE7E: fopen@@GLIBC_2.2.5 (iofopen.c:86)
+   n1: 472 0x10B22B: GenerateIntermediate (lexer.c:10)
+    n0: 472 0x10A667: main (assembler.c:17)
+   n1: 472 0x10B24B: GenerateIntermediate (lexer.c:11)
+    n0: 472 0x10A667: main (assembler.c:17)
+ n0: 22 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=59
+#-----------
+time=386155
+mem_heap_B=2992
+mem_heap_extra_B=56
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=60
+#-----------
+time=386592
+mem_heap_B=2480
+mem_heap_extra_B=48
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=61
+#-----------
+time=387100
+mem_heap_B=1496
+mem_heap_extra_B=24
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=62
+#-----------
+time=390355
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty

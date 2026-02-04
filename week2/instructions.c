@@ -10,7 +10,7 @@ int Resolve_ADD(const char* args[3], InstructionHex* out) { return 0; }
 int Resolve_RSUB(const char* args[3], InstructionHex* out) { return 0; }
 int Resolve_DIR(const char* args[3], InstructionHex* out) { return 0; }
 
-static const MnemonicInfo mnemonicTable[] = {
+static const MnemonicInfo OPTAB[] = {
     // assembler directives
     {MNEMONIC_START, 0, "DUMMY~~~", Resolve_DIR},
     {START, 0, "START", Resolve_DIR},
@@ -54,7 +54,7 @@ int IsDirective(const char* const str) {
     if (str == NULL) return 0;
 
     for (i = 0; i < DIRECTIVE_END; ++i) {
-        if (strcmp(str, mnemonicTable[i].name) == 0) return 1;
+        if (strcmp(str, OPTAB[i].name) == 0) return 1;
     }
     return 0;
 }
@@ -64,7 +64,7 @@ Mnemonic IsMnemonic(const char* const str) {
     if (str == NULL) return 0;
 
     for (i = MNEMONIC_START + 1; i < MNEMONIC_COUNT; ++i) {
-        if (strcmp(str, mnemonicTable[i].name) == 0) return i;
+        if (strcmp(str, OPTAB[i].name) == 0) return i;
     }
     return 0;
 }
@@ -76,7 +76,6 @@ int DirAddressToAdd(Mnemonic mne, int arg0, int isChar) {
         case END:
             return 3;
         case BYTE:
-            printf("on byte: isChar %d %d",isChar,arg0);
             return isChar ? arg0 : bytes_needed_unsigned(arg0);
         case RESB:
             return arg0;
