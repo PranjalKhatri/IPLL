@@ -8,13 +8,18 @@
 HashTable* SymbolTable;
 
 void Usage();
+void print_intptr(void* p) {
+    int value = (int)(intptr_t)p;
+    printf("%d", value);
+}
+void free_int(void* p) { free(p); }
 int main(int argc, char** argv) {
     if (argc > 3 || argc < 2) {
         Usage();
         return 1;
     }
     SymbolTable = ht_create();
-    int nameSz=100;
+    int nameSz  = 100;
     char outFile[nameSz];
     if (argc == 2) {
         snprintf(outFile, nameSz, "%s.out", argv[1]);
@@ -30,7 +35,7 @@ int main(int argc, char** argv) {
     }
     printf("Pass 1 Done. Symbol Table and Intermediate outputFile generated\n");
     printf("-------SymbolTable------\n");
-    ht_print(SymbolTable);
+    ht_print(SymbolTable, &print_intptr);
     if ((error = GenerateObject(argv[1], outFile, programLength,
                                 firstInstruction, SymbolTable))) {
         goto CleanupAndExit;
@@ -38,7 +43,7 @@ int main(int argc, char** argv) {
     }
     printf("Pass 2 Done. outputFile %s Created\n", outFile);
 CleanupAndExit:
-    ht_destroy(SymbolTable);
+    ht_destroy(SymbolTable, &free_int);
     return retVal;
 }
 
