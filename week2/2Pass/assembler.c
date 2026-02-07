@@ -7,6 +7,7 @@
 
 HashTable* SymbolTable;
 
+// prints the sample usage of the program
 void Usage();
 int main(int argc, char** argv) {
     if (argc > 3 || argc < 2) {

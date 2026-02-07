@@ -6,6 +6,9 @@
 #include "assembler.h"
 #include "util.h"
 
+// OPTAB is one of the two data structures used in assembler
+// array is used since it has less elements and hash table constant
+// factor takes more time as compared to linear search in such a small data
 static const MnemonicInfo OPTAB[] = {
     // assembler directives
     {MNEMONIC_START, 0, "DUMMY~~~"},
@@ -65,6 +68,10 @@ Mnemonic IsMnemonic(const char* const str) {
     return 0;
 }
 
+// Assembler directives have different effect on location as compared to mnemonics
+// This function resolves them. 
+// Start doesnt add anything. END adds 3, byte adds number of bytes needed for that argument
+// resw reserves wordsize*numwords
 int DirAddressToAdd(Mnemonic mne, int arg0, int isChar) {
     switch (mne) {
         case START:

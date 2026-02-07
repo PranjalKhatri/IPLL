@@ -2,6 +2,7 @@
 // prime number helps distribution
 #define TABLE_SIZE 101
 
+// Uses chaining
 typedef struct Entry {
     char* key;
     int value;

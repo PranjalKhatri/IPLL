@@ -4,9 +4,13 @@
 
 #include "assembler.h"
 
+// Write End record in the fp file
 void DumpEndRecord(FILE* fp, size_t FirstInstruction);
+// Writes Header record in the fp file.
 void DumpHeader(FILE* fp, const char* progName, size_t programLength,
                 size_t FirstInstruction);
+// Strips the location from the line so it becomes sourceline from intermediate
+// Line
 void StripLocation(char* line);
 
 int GenerateIntermediate(const char* const fname, size_t* capacity,
@@ -28,11 +32,11 @@ int GenerateIntermediate(const char* const fname, size_t* capacity,
     int retValue        = 0;
     const size_t buflen = 150;
     char buf[150];
-    size_t lineNo   = 0;
+    size_t lineNo   = 0;  // Sourse line no
     size_t index    = 0;
-    size_t loc      = 0;
-    size_t locStart = 0;
-    int isFirstMne  = 1;
+    size_t loc      = 0;  // current location
+    size_t locStart = 0;  // START location
+    int isFirstMne  = 1;  // first mnemonic should be start
 
     /* initial capacity */
     *capacity       = 8;
@@ -41,6 +45,8 @@ int GenerateIntermediate(const char* const fname, size_t* capacity,
     ObjectCodeLine obcl;
     ObjectCodeLine_init(&obcl);
 
+    // Scan line by line. Not using getline because its not c std.
+    // So maximum line size is defined
     while (fgets(buf, buflen, fp)) {
         size_t len = strlen(buf);
 
@@ -71,15 +77,19 @@ int GenerateIntermediate(const char* const fname, size_t* capacity,
             goto exit;
         }
         strcpy(sl.sourceLine, buf);
+        // Split source line into fields
         SplitInstruction(&sl);
+        // Dump comment directly
         if (!sl.isComment) {
             Mnemonic mne = IsMnemonic(sl.mnemonic);
             if (isFirstMne) {
+                // first mnemonic should be start always
                 if (mne != START) {
                     printf("First Mnemonic should be START");
                     retValue = 5;
                     goto exit;
                 }
+                // Header record supports 6 as max prog name
                 if (strlen(sl.label) > PROG_NAME_MAX_LENGTH) {
                     printf(
                         "Program name %s exceeds maximum allowed name length "
@@ -92,6 +102,7 @@ int GenerateIntermediate(const char* const fname, size_t* capacity,
                 loc        = strtol(sl.args[0], NULL, 16);
                 locStart   = loc;
             }
+            // End also contain first instruction to execute, else 0
             if (mne == END) {
                 int out = 0;
                 if (!ht_get(symbolTable, sl.args[0], &out)) {
@@ -105,6 +116,7 @@ int GenerateIntermediate(const char* const fname, size_t* capacity,
                 *firstInstructionAddress = out;
             }
             obcl.location = loc;
+            // put the label in symbolTable.  Check for redefinition
             if (sl.label != NULL) {
                 int out = 0;
                 if (ht_get(symbolTable, sl.label, &out)) {
@@ -245,10 +257,12 @@ exitObj:
 
 void DumpHeader(FILE* fp, const char* progName, size_t programLength,
                 size_t FirstInstruction) {
+    // Dump in format given in book
     fprintf(fp, "H%-6.6s%06zX%06zX\n", progName ? progName : "",
             FirstInstruction, programLength);
 }
 void DumpEndRecord(FILE* fp, size_t FirstInstruction) {
+    // Dump in format given in book
     fprintf(fp, "E%06zx\n", FirstInstruction);
 }
 
@@ -272,6 +286,7 @@ void SplitInstruction(SourceLine* const sl) {
     tok = strtok(sl->sourceLine, " \t,");
     if (tok == NULL) return;
 
+    // if first word is not mnemonic than its a label
     if (IsMnemonic(tok)) {
         sl->mnemonic = tok;
     } else {
