@@ -1,4 +1,4 @@
-
+#pragma once
 // prime number helps distribution
 #define TABLE_SIZE 101
 
