@@ -84,7 +84,7 @@ static void patch_pending(PendingLabel** head, HashTable* symtab, FILE* outfp) {
 }
 int Assemble(const char* fname, const char* outname, HashTable* symbolTable) {
     FILE* fp    = fopen(fname, "r");
-    FILE* outfp = fopen(outname, "w+");
+    FILE* outfp = fopen(outname, "wb+");
 
     if (!fp || !outfp) {
         printf("Unable to open input or output file\n");
