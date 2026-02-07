@@ -68,16 +68,14 @@ int ht_get(HashTable* ht, const char* key, int* out) {
     return 1;
 }
 
-void ht_add_backref(HashTable* ht, const char* key, long textOffset,
-                    long instrOffset, int useIndexed) {
-    Entry* e                = ht_find_or_create(ht, key);
+void ht_add_backref(HashTable* ht, const char* key, long file_offset,int useIndexed) {
+    Entry* e         = ht_find_or_create(ht, key);
 
-    BackRef* ref            = malloc(sizeof(BackRef));
-    ref->indexed            = useIndexed;
-    ref->text_offset        = textOffset;
-    ref->instruction_offset = instrOffset;
-    ref->next               = e->backrefs;
-    e->backrefs             = ref;
+    BackRef* ref     = malloc(sizeof(BackRef));
+    ref->indexed = useIndexed;
+    ref->file_offset = file_offset;
+    ref->next        = e->backrefs;
+    e->backrefs      = ref;
 }
 
 BackRef* ht_get_backrefs(HashTable* ht, const char* key) {
@@ -154,7 +152,7 @@ void ht_print(HashTable* ht) {
 
             BackRef* r = e->backrefs;
             while (r) {
-                printf("    backref @ %ld\n", r->text_offset);
+                printf("    backref @ %ld\n", r->file_offset);
                 r = r->next;
             }
             e = e->next;
@@ -174,7 +172,7 @@ int ht_check_unresolved(HashTable* ht) {
                 BackRef* r = e->backrefs;
                 while (r) {
                     fprintf(stderr, "  referenced at file offset %ld\n",
-                            r->text_offset);
+                            r->file_offset);
                     r = r->next;
                 }
 

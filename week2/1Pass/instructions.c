@@ -108,8 +108,8 @@ int AddressToAdd(Mnemonic mne, ObjectCodeLine* obcl) {
 
 // < 0 -> error
 // number of chars written
-int ResolveObjectCode(ObjectCodeLine* obcl, HashTable* symbolTable,
-                      long textOffset, char* buf, size_t buflen) {
+int ResolveObjectCode(ObjectCodeLine* obcl, HashTable* symbolTable, FILE* outfp,
+                      char* buf, size_t buflen) {
     Mnemonic mne = IsMnemonic(obcl->source->mnemonic);
     if (!mne) return -1;
 
@@ -185,10 +185,10 @@ int ResolveObjectCode(ObjectCodeLine* obcl, HashTable* symbolTable,
      * so ftell(outfp) == start of this object code.
      */
     if (needsPatch) {
-        long patchOffset =  2; /* skip opcode (2 hex chars) */
+        long instrStart  = ftell(outfp);
+        long patchOffset = instrStart + 2; /* skip opcode (2 hex chars) */
 
-        ht_add_backref(symbolTable, obcl->source->args[0],textOffset,patchOffset,
-                       useIndexed);
+        ht_add_backref(symbolTable, obcl->source->args[0], patchOffset,useIndexed);
     }
 
     return 3;

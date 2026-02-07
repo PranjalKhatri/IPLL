@@ -45,7 +45,7 @@ void PatchSymbol(HashTable* symbolTable, const char* symbol, int address,
             patchedAddr |= 0x8000;
         }
 
-        printf("fileoffset %ld with %04X\n", br->file_offset,
+        printf("\tfileoffset %ld with %04X\n", br->file_offset,
                patchedAddr & 0xFFFF);
         /* seek to address field */
         fseek(outfp, patchPos, SEEK_SET);
@@ -93,7 +93,7 @@ int Assemble(const char* fname, const char* outname, HashTable* symbolTable) {
         return 1;
     }
 
-    int retValue        = 0;
+    int retValue = 0;
 
     const size_t buflen = 150;
     char buf[150];
@@ -105,30 +105,29 @@ int Assemble(const char* fname, const char* outname, HashTable* symbolTable) {
     size_t firstInstructionAddress = 0;
     int isFirstMne                 = 1;
 
-    // Labels encountered in a single line of text in object file
-    // patch happens at  end of line
-    PendingLabel* pending          = NULL;
-    /* TEXT record state (same as 2-pass) */
-    int textLenBytes               = 0;
-    size_t textStartAddr           = 0;
-    char textBuf[128];
+    PendingLabel* pending = NULL;
+
+    /* TEXT record state */
+    int    textLenBytes   = 0;
+    size_t textStartAddr  = 0;
+    char   textBuf[128];
 
     char progName[7] = {0};
 
-    SourceLine sl;
+    SourceLine     sl;
     ObjectCodeLine obcl;
 
     SourceLine_init(&sl);
     ObjectCodeLine_init(&obcl);
 
-    /* reserve header line */
+    /* reserve space for header */
     fseek(outfp, 20, SEEK_SET);
 
     while (fgets(buf, buflen, fp)) {
         size_t len = strlen(buf);
-        if (len > 0 && buf[len - 1] == '\n') {
+        if (len > 0 && buf[len - 1] == '\n')
             buf[len - 1] = '\0';
-        } else if (len == buflen - 1) {
+        else if (len == buflen - 1) {
             printf("%zu line too long\n", lineNo + 1);
             retValue = 2;
             goto exit;
@@ -136,7 +135,7 @@ int Assemble(const char* fname, const char* outname, HashTable* symbolTable) {
 
         SourceLine_init(&sl);
         ObjectCodeLine_init(&obcl);
-        obcl.source   = &sl;
+        obcl.source = &sl;
 
         sl.lineNo     = ++lineNo;
         sl.sourceLine = strdup(buf);
@@ -171,9 +170,9 @@ int Assemble(const char* fname, const char* outname, HashTable* symbolTable) {
             strncpy(progName, sl.label, 6);
             progName[6] = '\0';
 
-            loc         = strtol(sl.args[0], NULL, 16);
-            locStart    = loc;
-            isFirstMne  = 0;
+            loc      = strtol(sl.args[0], NULL, 16);
+            locStart = loc;
+            isFirstMne = 0;
 
             free(sl.sourceLine);
             continue;
@@ -182,10 +181,8 @@ int Assemble(const char* fname, const char* outname, HashTable* symbolTable) {
         /* ---------- END ---------- */
         if (mne == END) {
             if (textLenBytes > 0) {
-                fprintf(outfp, "T%06zX%02X%s\n", textStartAddr, textLenBytes,
-                        textBuf);
-                // printf("output T%06zX%02X%s\n", textStartAddr, textLenBytes,
-                //        textBuf);
+                fprintf(outfp, "T%06zX%02X%s\n",
+                        textStartAddr, textLenBytes, textBuf);
                 patch_pending(&pending, symbolTable, outfp);
             }
 
@@ -207,14 +204,13 @@ int Assemble(const char* fname, const char* outname, HashTable* symbolTable) {
         if (sl.label) {
             int out;
             if (ht_get(symbolTable, sl.label, &out)) {
-                printf("Duplicate symbol %s on line %zu\n", sl.label,
-                       sl.lineNo);
+                printf("Duplicate symbol %s on line %zu\n",
+                       sl.label, sl.lineNo);
                 retValue = 6;
                 goto exit;
             }
 
             ht_put(symbolTable, sl.label, loc);
-            // patch after dumping this line
             add_pending(&pending, sl.label, loc);
         }
 
@@ -224,63 +220,56 @@ int Assemble(const char* fname, const char* outname, HashTable* symbolTable) {
 
         /* force flush for RESB / RESW */
         if (textLenBytes > 0 && (mne == RESB || mne == RESW)) {
-            printf("ADDRESS %zx\n", textStartAddr);
-            fprintf(outfp, "T%06zX%02X%s\n", textStartAddr, textLenBytes,
-                    textBuf);
-            // printf("Output T%06zX%02X%s\n", textStartAddr, textLenBytes,
-            //        textBuf);
+            fprintf(outfp, "T%06zX%02X%s\n",
+                    textStartAddr, textLenBytes, textBuf);
             patch_pending(&pending, symbolTable, outfp);
             textLenBytes = 0;
         }
 
-        /* start new TEXT record if needed */
         if (textLenBytes == 0) {
             textStartAddr = obcl.location;
             textBuf[0]    = '\0';
         }
 
-        /*
-         * Temporarily emit current TEXT prefix so ResolveObjectCode
-         * sees the correct file offset.
-         */
+        /* --------- FIX STARTS HERE --------- */
+
+        int instBytes = AddressToAdd(mne, &obcl);
+
+        /* decide TEXT record BEFORE resolving */
+        if (textLenBytes > 0 && textLenBytes + instBytes > 30) {
+            fprintf(outfp, "T%06zX%02X%s\n",
+                    textStartAddr, textLenBytes, textBuf);
+            patch_pending(&pending, symbolTable, outfp);
+
+            textLenBytes  = 0;
+            textStartAddr = obcl.location;
+            textBuf[0]    = '\0';
+        }
+
+        /* temporarily emit prefix so ResolveObjectCode sees correct offset */
         long savePos = ftell(outfp);
-        fprintf(outfp, "T%06zX%02X%s", textStartAddr, textLenBytes, textBuf);
+        fprintf(outfp, "T%06zX%02X%s",
+                textStartAddr, textLenBytes, textBuf);
 
-        int bytesWritten = ResolveObjectCode(&obcl, symbolTable, outfp, objBuf,
-                                             sizeof(objBuf));
+        int bytesWritten = ResolveObjectCode(
+            &obcl, symbolTable, outfp, objBuf, sizeof(objBuf));
 
-        /* restore file to pristine state */
         fseek(outfp, savePos, SEEK_SET);
+
+        /* --------- FIX ENDS HERE --------- */
 
         if (bytesWritten < 0) {
             retValue = bytesWritten;
             goto exit;
         }
 
-        if (bytesWritten == 0) {
-            loc += AddressToAdd(mne, &obcl);
-            free(sl.sourceLine);
-            continue;
+        if (bytesWritten > 0) {
+            strcat(textBuf, objBuf);
+            textLenBytes += bytesWritten;
         }
 
-        /* flush if overflow */
-        if (textLenBytes + bytesWritten > 30) {
-            printf("ADDRESS %zx\n", textStartAddr);
-            fprintf(outfp, "T%06zX%02X%s\n", textStartAddr, textLenBytes,
-                    textBuf);
-            // printf("Output T%06zX%02X%s\n", textStartAddr, textLenBytes,
-            //        textBuf);
-            patch_pending(&pending, symbolTable, outfp);
-            textLenBytes  = 0;
-            textStartAddr = obcl.location;
-            textBuf[0]    = '\0';
-        }
-
-        strcat(textBuf, objBuf);
-        textLenBytes  += bytesWritten;
-
-        loc           += AddressToAdd(mne, &obcl);
-        programLength  = loc - locStart;
+        loc          += instBytes;
+        programLength = loc - locStart;
 
         free(sl.sourceLine);
     }

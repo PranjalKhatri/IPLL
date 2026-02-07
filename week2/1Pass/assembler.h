@@ -96,8 +96,8 @@ void SplitInstruction(SourceLine* const sl);
 // Dumps the source lines for debugging in file fname
 void DumpLex(const char* const fname, SourceLine* sourceLines, size_t numLines);
 // Resolves objectcodeline struct into object code in hex and writes in buf
-int ResolveObjectCode(ObjectCodeLine* obcl, HashTable* symbolTable,
-                      long textOffset, char* buf, size_t buflen);
+int ResolveObjectCode(ObjectCodeLine* obcl, HashTable* symbolTable, FILE* outfp,
+                      char* buf, size_t buflen);
 // Dumps the object code in file fp
 void DumpObject(FILE* fp, ObjectCodeLine* ol);
 // Dumps Intermediate doe in file fname

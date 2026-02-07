@@ -5,8 +5,7 @@
 #define TABLE_SIZE 101
 
 typedef struct BackRef {
-    long text_offset;
-    long instruction_offset;  // where to patch
+    long file_offset;  // where to patch
     int indexed;  // Whether the original instruction used ,X addressing mode
     struct BackRef* next;
 } BackRef;
@@ -33,8 +32,8 @@ void ht_destroy(HashTable* ht);
 void ht_print(HashTable* ht);
 
 // backreference API
-void ht_add_backref(HashTable* ht, const char* key, long textOffset,
-                    long instrOffset, int useIndexed);
+void ht_add_backref(HashTable* ht, const char* key, long file_offset,
+                    int useIndexed);
 BackRef* ht_get_backrefs(HashTable* ht, const char* key);
 void ht_clear_backrefs(HashTable* ht, const char* key);
 
